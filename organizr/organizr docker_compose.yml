@@ -1,0 +1,25 @@
+version: '3.3'
+
+services:
+  organizr:
+    container_name: organizr
+    hostname: organizr
+    image: 'organizr/organizr:latest'
+    networks:
+      MACVLAN:     
+    ports:
+      - '8080:80'
+    environment:
+     - PUID=1001
+     - PGID=1001
+     - FPM='false'
+    volumes:
+      - 'organizr_data:/config'
+    restart: always
+
+networks:
+  MACVLAN: 
+    external: true
+volumes:
+  organizr_data:
+    external: true

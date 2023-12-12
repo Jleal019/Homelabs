@@ -1,0 +1,24 @@
+version: "2.1"
+
+services:
+  heimdall:
+    hostname: heimdall
+    image: lscr.io/linuxserver/heimdall:latest
+    container_name: temp
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - './fcd730bcbf585bc02c76f33e7b5d8fc10baec51c333e602947071d1cfe2ad9a8:/config'
+    networks:
+      myBridge:
+    ports:
+      - 80:80
+      - 443:443
+      
+    restart: unless-stopped
+
+networks:
+  myBridge:
+    external: true

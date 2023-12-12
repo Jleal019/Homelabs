@@ -1,0 +1,23 @@
+version: "3"
+
+services:
+  wazuh:
+    container_name: wazuh
+    hostname: wazuh
+    image: 'wazuh/wazuh'
+    networks:
+      MACVLAN:
+        ipv4_address: 192.168.1.99 # Set static LAN IP for container
+    environment:
+     - GUACD_LOG_LEVEL=debug # change to debug if having issues
+    volumes:
+      - './wazuhcerts:/config'
+    restart: always
+
+networks:
+  MACVLAN:
+    external: true
+    
+volumes:
+  wazuh_data:
+    external: true

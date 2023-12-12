@@ -1,0 +1,1 @@
+Place text of nginx.cong in /http.d directory

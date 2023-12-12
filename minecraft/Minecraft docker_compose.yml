@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  minecraft-java:
+    container_name: minecraft-java
+    hostname: minecraft-java
+    image: itzg/minecraft-server
+    ports:
+      - "25565:25565" # set IP to host IP so DNS can be resolved. Needed for Gravity updates.
+    tty: true
+    stdin_open: true
+    networks:
+      myBridge:
+        ipv4_address: 172.21.0.3 # Set static IP for container
+    environment:
+      EULA: "TRUE"
+    volumes:
+      - 'minecraft_java:/minecraft-java'
+    restart: unless-stopped
+
+networks:
+  myBridge:
+    external: true
+
+volumes:
+  minecraft_java:
+    external: true

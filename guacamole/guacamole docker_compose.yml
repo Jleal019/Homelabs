@@ -1,0 +1,72 @@
+version: "3"
+
+services:
+  guacd:
+    container_name: guacd
+    hostname: guacd
+    image: 'guacamole/guacd'
+    networks:
+      guac_net:
+        ipv4_address: 172.24.0.2 # Set static IP for container
+    environment:
+     - GUACD_LOG_LEVEL=info # change to debug if having issues
+    restart: always
+    
+  guacsql:
+    container_name: guacsql
+    hostname: guacsql
+    image: 'postgres:15.2-alpine'
+    networks:
+      guac_net:
+        ipv4_address: 172.24.0.3 # Set static IP for container
+    environment:
+      - POSTGRES_PASSWORD='' # Enter a password here.
+      - PGDATA=/var/lib/postgresql/data/
+      - POSTGRES_USER=guac # can't have quotes, why?
+      - POSTGRES_DB=guacamole_db
+    volumes:
+      - ./init/:/docker-entrypoint-initdb.d:r # must be absolute path
+      - 'postgres_data:/var/lib/postgresql/data/'
+    restart: always
+    
+  guacamole:
+    container_name: guacamole
+    hostname: guacamole
+    image: 'guacamole/guacamole'
+    ports:
+      - "8080/tcp"
+    links:
+      - 'guacd:guacd'
+      - 'guacsql:postgresql'
+    networks:
+      MACVLAN:
+        ipv4_address: 192.168.1.16 # Set static LAN IP for container
+      guac_net:
+        ipv4_address: 172.24.0.4 # Set static IP for container
+    environment:
+      - GUACD_HOSTNAME=guacd # best left as the ip
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOSTNAME=guacsql # best left as the ip
+      - POSTGRES_DATABASE=guacamole_db
+      - POSTGRES_USER=guac
+      - POSTGRES_PASSWORD='d5TtV93P' # Enter a password here.
+    # Volumes store your data between container upgrades
+    volumes:
+      - 'guac_home_data:/home/guacamole/'
+      - 'guacamole_data:/etc/guacamole/' 
+
+networks:
+  MACVLAN:
+    external: true
+  guac_net:
+    external: true
+    
+volumes:
+  guac_home_data:
+    external: true
+  guacamole_data:
+    external: true
+  postgres_data:
+    external: true
+  init:
+    external: true

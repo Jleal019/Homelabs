@@ -1,0 +1,39 @@
+# More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
+# Add user to docker group to avoid major problems.
+version: "3"
+
+services:
+  pihole:
+    container_name: pihole
+    hostname: pihole
+    image: pihole/pihole
+    # For DHCP it is recommended to remove these ports and instead add: network_mode: "host"
+    ports:
+      - "53:53/tcp"
+      - "192.168.1.27:53:53/udp" # set IP to host IP so DNS can be resolved. Needed for Gravity updates.
+      - "8080:8080/tcp"
+    networks:
+      MACVLAN:
+        ipv4_address: 192.168.1.31 # Set static LAN IP for container
+    environment:
+      TZ: 'America/New York'
+    #  WEBPASSWORD: 'Password123' #change with command pihole -a -p
+    # Volumes store your data between container upgrades
+    volumes:
+      - 'pihole:/etc/pihole'
+      - 'dns_config:/etc/dnsmasq.d'
+    #   https://github.com/pi-hole/docker-pi-hole#note-on-capabilities
+
+#    cap_add:
+#      - NET_ADMIN # Required if you are using Pi-hole as your DHCP server, else not needed
+    restart: unless-stopped
+
+networks:
+  MACVLAN:
+    external: true
+
+volumes:
+  pihole:
+    external: true
+  dns_config:
+    external: true
