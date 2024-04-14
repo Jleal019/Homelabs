@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  minecraft-bedrock:
+    container_name: minecraft-bedrock
+    hostname: minecraft-bedrock
+    image: itzg/minecraft-bedrock-server
+    ports:
+      - "19132:19132/udp"
+    stdin_open: true
+    networks:
+      myBridge:
+        ipv4_address: 172.21.0.3
+    environment:
+      EULA: "TRUE"
+      VERSION: "LATEST"
+      PACKAGE_BACKUP_KEEP: "2"
+
+    volumes:
+      - 'minecraft_bedrock:/minecraft-bedrock'
+    restart: unless-stopped
+
+networks:
+  myBridge:
+    external: true
+
+volumes:
+  minecraft_bedrock:
+    external: true
